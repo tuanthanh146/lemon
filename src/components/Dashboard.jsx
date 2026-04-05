@@ -83,21 +83,51 @@ const PlanItem = ({ icon: Icon, text, time, done, onToggle }) => (
 
 export default function Dashboard({ entries }) {
     // Plans State
-    const [plans, setPlans] = useState([
-        { id: 1, text: "Uống 2L nước", time: "7/8 cốc", done: true },
-        { id: 2, text: "Đi bộ 5000 bước", time: "5430/5000", done: true },
+    const defaultPlans = [
+        { id: 1, text: "Uống 2L nước", time: "Hôm nay", done: false },
+        { id: 2, text: "Đi bộ 5000 bước", time: "Hôm nay", done: false },
         { id: 3, text: "Ngủ trước 11h", time: "Tối nay", done: false }
-    ]);
+    ];
+    
+    const [plans, setPlans] = useState(defaultPlans);
     const [newPlan, setNewPlan] = useState("");
 
+    // Load from LocalStorage & Daily Reset Logic
+    useEffect(() => {
+        const today = new Date().toLocaleDateString('vi-VN');
+        const savedData = localStorage.getItem('lemon_daily_plans');
+        
+        if (savedData) {
+            try {
+                const { date, items } = JSON.parse(savedData);
+                if (date === today) {
+                    setPlans(items); // Vẫn trong ngày -> Giữ nguyên trạng thái
+                } else {
+                    // Qua ngày mới -> Giữ lại danh sách nhưng Reset trạng thái done = false
+                    const resetItems = items.map(p => ({ ...p, done: false }));
+                    setPlans(resetItems);
+                    localStorage.setItem('lemon_daily_plans', JSON.stringify({ date: today, items: resetItems }));
+                }
+            } catch (e) {
+                setPlans(defaultPlans);
+            }
+        }
+    }, []);
+
+    const updatePlans = (newPlans) => {
+        setPlans(newPlans);
+        const today = new Date().toLocaleDateString('vi-VN');
+        localStorage.setItem('lemon_daily_plans', JSON.stringify({ date: today, items: newPlans }));
+    };
+
     const togglePlan = (id) => {
-        setPlans(plans.map(p => p.id === id ? { ...p, done: !p.done } : p));
+        updatePlans(plans.map(p => p.id === id ? { ...p, done: !p.done } : p));
     };
 
     const addPlan = (e) => {
         e.preventDefault();
         if (!newPlan.trim()) return;
-        setPlans([...plans, { id: Date.now(), text: newPlan, time: "Hôm nay", done: false }]);
+        updatePlans([...plans, { id: Date.now(), text: newPlan, time: "Hôm nay", done: false }]);
         setNewPlan("");
     };
 

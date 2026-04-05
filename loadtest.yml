@@ -1,0 +1,20 @@
+config:
+  # Cảnh báo: Thay đổi đường dẫn này thành link Vercel thực tế của bạn
+  # Ví dụ: https://lemon-project.vercel.app
+  target: "https://lemon-dun.vercel.app/"
+  phases:
+    - duration: 10
+      arrivalRate: 5
+      name: "Khởi động nhẹ nhàng (Warm up) - 5 luồng mỗi giây"
+    - duration: 20
+      arrivalRate: 20
+      name: "Tăng tải (Ramp up) - Vọt lên 20 luồng mỗi giây"
+
+scenarios:
+  - name: "Chỉ Load Landing Page tĩnh (An toàn)"
+    flow:
+      - get:
+          url: "/"
+      - think: 2 # Giả lập user dừng lại nhìn mạch 2 giây
+      - get:
+          url: "/login"
