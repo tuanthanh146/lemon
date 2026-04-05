@@ -7,12 +7,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
 model User {
   id           String        @id @default(uuid())
   username     String        @unique
   passwordHash String
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+  role         Role          @default(USER)
+  isLocked     Boolean       @default(false)
   refreshTokenHash String?
   journals     Journal[]
   chatSessions ChatSession[]
@@ -81,5 +88,14 @@ model FoodCalories {
   portion   String
   calories  Int
   category  String
+  createdAt DateTime @default(now())
+}
+
+model SystemLog {
+  id        String   @id @default(uuid())
+  level     String   @default("INFO") // INFO, ERROR, WARNING
+  module    String   // e.g. "AI_COACH", "AUTH", "NUTRITION"
+  message   String
+  details   String?  // JSON stringified errors
   createdAt DateTime @default(now())
 }
