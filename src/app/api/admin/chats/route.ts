@@ -17,7 +17,11 @@ export async function GET(req: Request) {
         id: true,
         createdAt: true,
         user: { select: { username: true } },
-        _count: { select: { messages: true } }
+        _count: { select: { messages: true } },
+        messages: {
+           select: { id: true, role: true, content: true, createdAt: true },
+           orderBy: { createdAt: 'asc' }
+        }
       },
       orderBy: { createdAt: 'desc' },
       skip,
