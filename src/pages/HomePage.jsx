@@ -91,7 +91,7 @@ export default function HomePage() {
                     </div>
                     <div>
                         <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-teal-700 to-emerald-600">
-                            Health Journal Coach
+                            Lemon
                         </h1>
                         <p className="text-xs text-slate-500 font-medium tracking-wide">YOUR PERSONAL WELLNESS COMPANION</p>
                     </div>

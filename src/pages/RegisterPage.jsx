@@ -45,7 +45,7 @@ export default function RegisterPage() {
             <BookHeart className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-teal-700 to-emerald-600">
-            Health Journal Coach
+            Lemon
           </h1>
           <p className="text-slate-500 mt-1 text-sm">Tạo tài khoản mới</p>
         </div>
