@@ -14,7 +14,7 @@ export default function AdminChatsPage() {
     const fetchChats = async () => {
       setLoading(true);
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('accessToken');
         const res = await axios.get(`/api/admin/chats?page=${page}`, {
           headers: { Authorization: `Bearer ${token}` }
         });

@@ -15,7 +15,7 @@ export default function AdminUsersPage() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('accessToken');
       const res = await axios.get(`/api/admin/users?page=${page}&search=${search}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -36,7 +36,7 @@ export default function AdminUsersPage() {
   const toggleLock = async (id: string, isLocked: boolean) => {
     if (!confirm(`Bạn chắc chắn muốn ${isLocked ? 'MỞ KHÓA' : 'KHÓA'} tài khoản này?`)) return;
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('accessToken');
       await axios.patch(`/api/admin/users/${id}`, { isLocked: !isLocked }, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -50,7 +50,7 @@ export default function AdminUsersPage() {
     const newRole = currentRole === 'ADMIN' ? 'USER' : 'ADMIN';
     if (!confirm(`Bạn chắc chắn muốn đổi quyền user này thành ${newRole}?`)) return;
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('accessToken');
       await axios.patch(`/api/admin/users/${id}`, { role: newRole }, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -63,7 +63,7 @@ export default function AdminUsersPage() {
   const deleteUser = async (id: string) => {
     if (!confirm('CẢNH BÁO: Hành động này sẽ xoá VĨNH VIỄN user và toàn bộ dữ liệu (nhật ký, chat) của họ!')) return;
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('accessToken');
       await axios.delete(`/api/admin/users/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });

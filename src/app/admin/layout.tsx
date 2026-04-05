@@ -21,7 +21,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   useEffect(() => {
     const verifyAdmin = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('accessToken');
         if (!token) throw new Error("No token");
 
         await axios.get('/api/admin/summary', {
@@ -37,7 +37,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, [router]);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
     router.push('/login');
   };
 
