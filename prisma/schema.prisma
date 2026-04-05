@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String        @id @default(uuid())
+  username     String        @unique
+  passwordHash String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  refreshTokenHash String?
+  journals     Journal[]
+  chatSessions ChatSession[]
+  insights     Insight[]
+  nutritionLogs NutritionLog[]
+}
+
+model Journal {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date       DateTime @default(now())
+  mood       Int
+  sleepHours Float?
+  water      Int?
+  calories   Int?
+  weight     Float?
+  meals      String?
+  workout    String?
+  notes      String?
+  createdAt  DateTime @default(now())
+}
+
+model ChatSession {
+  id        String        @id @default(uuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  ChatMessage[]
+  createdAt DateTime      @default(now())
+}
+
+model ChatMessage {
+  id          String      @id @default(uuid())
+  sessionId   String
+  session     ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  role        String
+  content     String
+  createdAt   DateTime    @default(now())
+}
+
+model Insight {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  range     String
+  summary   String
+  createdAt DateTime @default(now())
+}
+
+model NutritionLog {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  image      String?  
+  foodName   String?
+  calories   Int
+  items      String   // Contains JSON string of array
+  confidence String   
+  notes      String?
+  createdAt  DateTime @default(now())
+}
+
+model FoodCalories {
+  id        String   @id @default(uuid())
+  name      String
+  portion   String
+  calories  Int
+  category  String
+  createdAt DateTime @default(now())
+}
