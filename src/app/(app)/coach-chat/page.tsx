@@ -12,6 +12,7 @@ export default function CoachChatPage() {
       text: 'Chào bạn! Mình là Lemon. Báo cáo Tình trạng Sức khỏe của bạn hôm nay nhé!'
     }
   ]);
+  const [sessionId, setSessionId] = useState<string | null>(null);
 
   const handleSendMessage = async (text: string) => {
     // 1. Add user msg
@@ -27,8 +28,12 @@ export default function CoachChatPage() {
       }));
       chatHistory.push({ role: 'user', content: text });
 
-      const { data } = await axios.post('/coach/chat', { messages: chatHistory });
+      const { data } = await axios.post('/coach/chat', { messages: chatHistory, sessionId });
       const reply = data.data; // Expected { reply: "...", actions_today: [], warning: false }
+      
+      if (data.sessionId && !sessionId) {
+        setSessionId(data.sessionId);
+      }
 
       setMessages(prev => {
         const base = prev.slice(0, -1);

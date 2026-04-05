@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     if (!payload?.sub) return NextResponse.json({}, { status: 401 });
 
     const userId = payload.sub as string;
-    const { messages } = await req.json(); // Array of { role, content }
+    const { messages, sessionId } = await req.json(); // Array of { role, content }
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json({ success: false, error: 'Messages are required' }, { status: 400 });
@@ -64,9 +64,48 @@ Quy tắc:
     const aiContentRaw = aiData.choices[0].message.content;
     const aiResponse = JSON.parse(aiContentRaw);
 
-    // TODO: Create a chat session in DB if you want to store history. Currently stateless logic is provided, so the user can see immediate response.
+    let activeSessionId = sessionId;
 
-    return NextResponse.json({ success: true, data: aiResponse });
+    try {
+      if (!activeSessionId) {
+        // Create new session
+        const newSession = await prisma.chatSession.create({
+          data: {
+            userId,
+            // Insert all history up to this point
+            messages: {
+              create: messages.map((m: any) => ({
+                role: m.role,
+                content: m.content
+              }))
+            }
+          }
+        });
+        activeSessionId = newSession.id;
+        
+        // Append the AI reply to this new session
+        await prisma.chatMessage.create({
+          data: {
+            sessionId: activeSessionId,
+            role: 'assistant',
+            content: aiContentRaw
+          }
+        });
+      } else {
+        // Just append the newly sent user message (the last one in array) and the AI response
+        const lastUserMessage = messages[messages.length - 1];
+        await prisma.chatMessage.createMany({
+          data: [
+            { sessionId: activeSessionId, role: 'user', content: lastUserMessage.content },
+            { sessionId: activeSessionId, role: 'assistant', content: aiContentRaw }
+          ]
+        });
+      }
+    } catch (dbErr) {
+       console.error("DB Save Chat Error", dbErr);
+    }
+
+    return NextResponse.json({ success: true, data: aiResponse, sessionId: activeSessionId });
   } catch (error: any) {
     console.error('Coach API Error:', error);
     return NextResponse.json({ success: false, error: error.message || 'Internal server error' }, { status: 500 });
